@@ -15,7 +15,19 @@ export async function GET(req: NextRequest) {
 
   const filter: Record<string, unknown> = { status: "published" };
   if (category) filter.categories = category;
-  if (q) filter.$text = { $search: q };
+  if (q) {
+    const pattern = { $regex: q, $options: "i" };
+    filter.$or = [
+      { name: pattern },
+      { description: pattern },
+      { shortDescription: pattern },
+      { sku: pattern },
+      { tags: pattern },
+      { colors: pattern },
+      { material: pattern },
+      { sizes: pattern },
+    ];
+  }
 
   const sortMap: Record<string, Record<string, 1 | -1>> = {
     newest: { createdAt: -1 },
