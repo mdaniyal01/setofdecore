@@ -5,6 +5,7 @@ import Product from "@/models/Product";
 import Order from "@/models/Order";
 import { nextOrderNumber } from "@/lib/orderNumber";
 import { calculateShipping, validateAndPriceCoupon, PricingError } from "@/lib/pricing";
+import { getCustomerFromRequest } from "@/lib/customerAuth";
 
 const orderSchema = z.object({
   items: z
@@ -141,9 +142,11 @@ export async function POST(req: NextRequest) {
   const total = subtotal - discount + shippingFee;
 
   const orderNumber = await nextOrderNumber();
+  const loggedInCustomer = getCustomerFromRequest(req);
 
   const order = await Order.create({
     orderNumber,
+    customer: loggedInCustomer?.customerId,
     guestInfo,
     items: orderItems,
     subtotal,
