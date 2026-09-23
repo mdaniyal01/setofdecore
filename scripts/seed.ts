@@ -3,6 +3,7 @@
  * before production (see README "Not yet built" / section 119 of the spec).
  * Run with: npx tsx scripts/seed.ts  (or ts-node)
  */
+import "dotenv/config";
 import mongoose from "mongoose";
 import Category from "../src/models/Category";
 import Product from "../src/models/Product";

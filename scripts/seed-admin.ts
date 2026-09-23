@@ -2,6 +2,7 @@
  * Creates (or resets the password of) the first super_admin user.
  * Run with: npx tsx scripts/seed-admin.ts you@email.com yourPassword123
  */
+import "dotenv/config";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import AdminUser from "../src/models/AdminUser";
