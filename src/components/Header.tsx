@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
 
@@ -30,8 +31,9 @@ export default function Header() {
           </svg>
         </button>
 
-        <Link href="/" className="font-display text-xl tracking-tight">
-          Set of Decore
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/images/logo-header.png" alt="Set of Decore" width={38} height={38} priority />
+          <span className="hidden font-display text-lg tracking-tight sm:block">Set of Decore</span>
         </Link>
 
         <nav className="hidden gap-8 text-sm md:flex">

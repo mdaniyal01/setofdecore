@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   },
   description:
     "Thoughtfully selected home textiles — bedsheets, sofa covers, curtains and cushion covers — with nationwide delivery across Pakistan.",
+  icons: {
+    icon: "/images/favicon.png",
+    apple: "/images/favicon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
