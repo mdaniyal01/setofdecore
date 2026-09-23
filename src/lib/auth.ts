@@ -56,6 +56,22 @@ export function requirePermission(req: NextRequest, permission: string): AdminTo
   return payload;
 }
 
+/**
+ * Verifies the admin session without checking a specific permission. Used for
+ * screens any logged-in admin can view (e.g. the dashboard shell). Business
+ * actions still go through requirePermission().
+ */
+export function requireAdminSession(req: NextRequest): AdminTokenPayload {
+  const authHeader = req.headers.get("authorization");
+  const cookieToken = req.cookies.get("admin_token")?.value;
+  const token = authHeader?.replace("Bearer ", "") ?? cookieToken;
+
+  if (!token) throw new AuthError("Not authenticated", 401);
+  const payload = verifyAdminToken(token);
+  if (!payload) throw new AuthError("Invalid or expired session", 401);
+  return payload;
+}
+
 export class AuthError extends Error {
   status: number;
   constructor(message: string, status: number) {
