@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import ProductCard, { ProductCardData } from "@/components/ProductCard";
+import ShopClient from "./ShopClient";
 
 export const metadata: Metadata = {
   title: "Shop All",
@@ -16,7 +16,7 @@ async function getProducts(searchParams: Record<string, string | undefined>) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/products?${params}`, {
     next: { revalidate: 60 },
   });
-  if (!res.ok) return { data: [] as ProductCardData[], pagination: null };
+  if (!res.ok) return { data: [], pagination: null };
   return res.json();
 }
 
@@ -27,23 +27,5 @@ export default async function ShopPage({
 }) {
   const { data: products } = await getProducts(searchParams);
 
-  return (
-    <main className="mx-auto max-w-6xl px-6 py-12">
-      <div className="flex items-baseline justify-between border-b border-ink/10 pb-6">
-        <h1 className="font-display text-3xl">Shop All</h1>
-        <p className="text-sm text-taupe">{products.length} products</p>
-      </div>
-
-      <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
-        {products.length === 0 && (
-          <p className="col-span-full py-16 text-center text-taupe">
-            No products to show yet — check back soon.
-          </p>
-        )}
-        {products.map((product: ProductCardData) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
-      </div>
-    </main>
-  );
+  return <ShopClient initialProducts={products} initialSort={searchParams.sort ?? "newest"} />;
 }

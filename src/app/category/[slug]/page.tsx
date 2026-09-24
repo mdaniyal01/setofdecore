@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import ProductCard, { ProductCardData } from "@/components/ProductCard";
+import AnimatedProductGrid from "@/components/AnimatedProductGrid";
 
 async function getCategory(slug: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/categories`, {
@@ -67,15 +67,12 @@ export default async function CategoryPage({ params }: { params: { slug: string 
         )}
       </div>
 
-      <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
-        {products.length === 0 && (
-          <p className="col-span-full py-16 text-center text-taupe">
-            No products in this category yet.
-          </p>
+      <div className="mt-10">
+        {products.length === 0 ? (
+          <p className="py-16 text-center text-taupe">No products in this category yet.</p>
+        ) : (
+          <AnimatedProductGrid products={products} />
         )}
-        {products.map((product: ProductCardData) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
       </div>
     </main>
   );
