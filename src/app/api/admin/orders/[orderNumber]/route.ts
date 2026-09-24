@@ -4,11 +4,12 @@ import { connectDB } from "@/lib/mongodb";
 import { requirePermission, AuthError } from "@/lib/auth";
 import Order, { OrderStatus } from "@/models/Order";
 
-export async function GET(req: NextRequest, { params }: { params: { orderNumber: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ orderNumber: string }> }) {
   try {
     requirePermission(req, "orders.manage");
     await connectDB();
-    const order = await Order.findOne({ orderNumber: params.orderNumber }).lean();
+    const { orderNumber } = await params;
+    const order = await Order.findOne({ orderNumber }).lean();
     if (!order) return NextResponse.json({ error: "Order not found." }, { status: 404 });
     return NextResponse.json({ order });
   } catch (err) {
@@ -29,15 +30,16 @@ const updateSchema = z.object({
   note: z.string().optional(),
 });
 
-export async function PUT(req: NextRequest, { params }: { params: { orderNumber: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ orderNumber: string }> }) {
   try {
     const admin = requirePermission(req, "orders.manage");
     await connectDB();
+    const { orderNumber } = await params;
 
     const parsed = updateSchema.safeParse(await req.json());
     if (!parsed.success) return NextResponse.json({ error: "Invalid update." }, { status: 400 });
 
-    const order = await Order.findOne({ orderNumber: params.orderNumber });
+    const order = await Order.findOne({ orderNumber });
     if (!order) return NextResponse.json({ error: "Order not found." }, { status: 404 });
 
     if (parsed.data.orderStatus && parsed.data.orderStatus !== order.orderStatus) {

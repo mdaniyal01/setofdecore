@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Collection from "@/models/Collection";
 
-export async function GET(_req: NextRequest, { params }: { params: { slug: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   await connectDB();
+  const { slug } = await params;
 
-  const collection = await Collection.findOne({ slug: params.slug, isActive: true })
+  const collection = await Collection.findOne({ slug, isActive: true })
     .populate({
       path: "products",
       match: { status: "published" },

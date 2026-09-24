@@ -23,9 +23,10 @@ async function getProducts(searchParams: Record<string, string | undefined>) {
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | undefined>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }) {
-  const { data: products } = await getProducts(searchParams);
+  const resolvedSearchParams = await searchParams;
+  const { data: products } = await getProducts(resolvedSearchParams);
 
-  return <ShopClient initialProducts={products} initialSort={searchParams.sort ?? "newest"} />;
+  return <ShopClient initialProducts={products} initialSort={resolvedSearchParams.sort ?? "newest"} />;
 }

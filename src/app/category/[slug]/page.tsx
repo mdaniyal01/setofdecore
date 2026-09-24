@@ -24,9 +24,10 @@ async function getProducts(categoryId: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const category = await getCategory(params.slug);
+  const { slug } = await params;
+  const category = await getCategory(slug);
   if (!category) return {};
   return {
     title: category.seo?.title || category.name,
@@ -35,8 +36,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const category = await getCategory(params.slug);
+export default async function CategoryPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const category = await getCategory(slug);
   if (!category) notFound();
 
   const products = await getProducts(category._id);

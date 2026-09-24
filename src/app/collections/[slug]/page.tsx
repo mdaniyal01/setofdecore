@@ -14,9 +14,10 @@ async function getCollection(slug: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const collection = await getCollection(params.slug);
+  const { slug } = await params;
+  const collection = await getCollection(slug);
   if (!collection) return {};
   return {
     title: collection.seo?.title || collection.name,
@@ -25,8 +26,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function CollectionPage({ params }: { params: { slug: string } }) {
-  const collection = await getCollection(params.slug);
+export default async function CollectionPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const collection = await getCollection(slug);
   if (!collection) notFound();
 
   return (
