@@ -8,9 +8,15 @@ interface Category {
   name: string;
 }
 
+interface Supplier {
+  _id: string;
+  supplierName: string;
+}
+
 export default function ProductForm({ productId }: { productId?: string }) {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(!!productId);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +32,7 @@ export default function ProductForm({ productId }: { productId?: string }) {
     categories: [] as string[],
     material: "",
     careInstructions: "",
+    supplier: "",
     supplierProductCode: "",
     supplierCost: undefined as number | undefined,
     internalNotes: "",
@@ -38,6 +45,9 @@ export default function ProductForm({ productId }: { productId?: string }) {
     fetch("/api/admin/categories")
       .then((r) => r.json())
       .then((data) => setCategories(data.categories ?? []));
+    fetch("/api/admin/suppliers")
+      .then((r) => r.json())
+      .then((data) => setSuppliers(data.suppliers ?? []));
   }, []);
 
   useEffect(() => {
@@ -57,6 +67,7 @@ export default function ProductForm({ productId }: { productId?: string }) {
           categories: (p.categories ?? []).map((c: any) => c.toString?.() ?? c),
           material: p.material ?? "",
           careInstructions: p.careInstructions ?? "",
+          supplier: p.supplier?.toString?.() ?? p.supplier ?? "",
           supplierProductCode: p.supplierProductCode ?? "",
           supplierCost: p.supplierCost,
           internalNotes: p.internalNotes ?? "",
@@ -161,6 +172,19 @@ export default function ProductForm({ productId }: { productId?: string }) {
 
       <section className="space-y-4 border border-black/10 bg-white p-6">
         <p className="text-sm font-medium">Supplier (internal — never shown to customers)</p>
+        <div>
+          <label className="text-sm text-black/60">Supplier</label>
+          <select
+            value={form.supplier}
+            onChange={(e) => update("supplier", e.target.value)}
+            className="mt-1 w-full max-w-xs border border-black/15 bg-white px-3 py-2 text-sm"
+          >
+            <option value="">— None —</option>
+            {suppliers.map((s) => (
+              <option key={s._id} value={s._id}>{s.supplierName}</option>
+            ))}
+          </select>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <LabeledInput label="Supplier Product Code" value={form.supplierProductCode} onChange={(v) => update("supplierProductCode", v)} />
           <LabeledNumber label="Supplier Cost (Rs.)" value={form.supplierCost} onChange={(v) => update("supplierCost", v)} />

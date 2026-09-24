@@ -1,0 +1,45 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { connectDB } from "@/lib/mongodb";
+import { requirePermission, AuthError } from "@/lib/auth";
+import Supplier from "@/models/Supplier";
+
+const schema = z.object({
+  supplierName: z.string().min(2),
+  businessName: z.string().optional(),
+  phone: z.string().min(6),
+  city: z.string().optional(),
+  address: z.string().optional(),
+  productCategories: z.array(z.string()).default([]),
+  paymentTerms: z.string().optional(),
+  wholesaleTerms: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export async function GET(req: NextRequest) {
+  try {
+    requirePermission(req, "suppliers.manage");
+    await connectDB();
+    const suppliers = await Supplier.find({}).sort({ supplierName: 1 }).lean();
+    return NextResponse.json({ suppliers });
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    throw err;
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    requirePermission(req, "suppliers.manage");
+    await connectDB();
+
+    const parsed = schema.safeParse(await req.json());
+    if (!parsed.success) return NextResponse.json({ error: "Invalid supplier data." }, { status: 400 });
+
+    const supplier = await Supplier.create({ ...parsed.data, status: "active" });
+    return NextResponse.json({ supplier }, { status: 201 });
+  } catch (err) {
+    if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
+    throw err;
+  }
+}
