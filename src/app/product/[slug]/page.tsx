@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import ProductActions from "@/components/ProductActions";
 import ProductGallery from "@/components/ProductGallery";
 import ProductPageMotion from "@/components/ProductPageMotion";
+import ProductReviews from "@/components/ProductReviews";
 
 async function getProduct(slug: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/products/${slug}`, {
@@ -112,6 +113,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
       </ProductPageMotion>
+
+      <ProductReviews productId={product._id} />
     </main>
   );
 }
