@@ -45,6 +45,7 @@ const NAV_SECTIONS = [
     items: [
       { href: "/admin/messages", label: "Messages" },
       { href: "/admin/admin-users", label: "Admin Users" },
+      { href: "/admin/audit-logs", label: "Audit Logs" },
       { href: "/admin/settings", label: "Settings" },
     ],
   },

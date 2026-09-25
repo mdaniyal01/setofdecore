@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { requirePermission, AuthError } from "@/lib/auth";
 import Product from "@/models/Product";
+import { recordAuditLog } from "@/lib/auditLog";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -19,16 +20,28 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    requirePermission(req, "products.manage");
+    const admin = requirePermission(req, "products.manage");
     await connectDB();
     const { id } = await params;
 
     const body = await req.json();
+    const before = await Product.findById(id).select("basePrice salePrice status").lean();
+
     // Price, cost, and status changes are legitimate admin actions here —
     // unlike the customer-facing order flow, this route IS the trusted path
     // for setting prices. It is only reachable with products.manage permission.
     const product = await Product.findByIdAndUpdate(id, body, { new: true });
     if (!product) return NextResponse.json({ error: "Product not found." }, { status: 404 });
+
+    if (before && (before.basePrice !== body.basePrice || before.salePrice !== body.salePrice)) {
+      await recordAuditLog({
+        adminId: admin.adminId,
+        action: "product.price_changed",
+        entity: "Product",
+        entityId: id,
+        metadata: { from: { basePrice: before.basePrice, salePrice: before.salePrice }, to: { basePrice: body.basePrice, salePrice: body.salePrice } },
+      });
+    }
 
     return NextResponse.json({ product });
   } catch (err) {

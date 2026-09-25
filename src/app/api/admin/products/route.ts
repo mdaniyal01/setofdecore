@@ -4,6 +4,7 @@ import slugify from "slugify";
 import { connectDB } from "@/lib/mongodb";
 import { requirePermission, AuthError } from "@/lib/auth";
 import Product from "@/models/Product";
+import { recordAuditLog } from "@/lib/auditLog";
 
 const productSchema = z.object({
   name: z.string().min(2),
@@ -60,7 +61,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    requirePermission(req, "products.manage");
+    const admin = requirePermission(req, "products.manage");
     await connectDB();
 
     const parsed = productSchema.safeParse(await req.json());
@@ -76,6 +77,14 @@ export async function POST(req: NextRequest) {
         title: `${parsed.data.name} | Set of Decore`,
         description: parsed.data.shortDescription,
       },
+    });
+
+    await recordAuditLog({
+      adminId: admin.adminId,
+      action: "product.created",
+      entity: "Product",
+      entityId: product._id.toString(),
+      metadata: { name: product.name, basePrice: product.basePrice },
     });
 
     return NextResponse.json({ product }, { status: 201 });

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { connectDB } from "@/lib/mongodb";
 import { requirePermission, AuthError } from "@/lib/auth";
 import Order, { OrderStatus } from "@/models/Order";
+import { recordAuditLog } from "@/lib/auditLog";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ orderNumber: string }> }) {
   try {
@@ -58,6 +59,17 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ orde
     }
 
     await order.save();
+
+    if (parsed.data.orderStatus) {
+      await recordAuditLog({
+        adminId: admin.adminId,
+        action: "order.status_changed",
+        entity: "Order",
+        entityId: order.orderNumber,
+        metadata: { toStatus: parsed.data.orderStatus },
+      });
+    }
+
     return NextResponse.json({ order });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ error: err.message }, { status: err.status });
