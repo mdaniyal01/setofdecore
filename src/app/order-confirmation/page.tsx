@@ -1,14 +1,17 @@
 import Link from "next/link";
+import PurchaseTracker from "@/components/PurchaseTracker";
 
 export default function OrderConfirmationPage({
   searchParams,
 }: {
-  searchParams: { orderNumber?: string };
+  searchParams: { orderNumber?: string; total?: string };
 }) {
   const orderNumber = searchParams.orderNumber;
+  const total = searchParams.total ? Number(searchParams.total) : 0;
 
   return (
     <main className="mx-auto max-w-xl px-6 py-24 text-center">
+      {orderNumber && <PurchaseTracker orderNumber={orderNumber} total={total} />}
       <h1 className="font-display text-3xl">Thank you for your order.</h1>
       {orderNumber && (
         <p className="mt-4 text-lg">

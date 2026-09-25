@@ -4,6 +4,7 @@ import ProductActions from "@/components/ProductActions";
 import ProductGallery from "@/components/ProductGallery";
 import ProductPageMotion from "@/components/ProductPageMotion";
 import ProductReviews from "@/components/ProductReviews";
+import ViewItemTracker from "@/components/ViewItemTracker";
 
 async function getProduct(slug: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/products/${slug}`, {
@@ -61,6 +62,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <main className="mx-auto max-w-6xl px-6 py-12">
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <ViewItemTracker product={product} />
 
       <ProductPageMotion>
         <div className="grid gap-10 md:grid-cols-2">

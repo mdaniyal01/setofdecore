@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import { trackBeginCheckout } from "@/lib/analytics";
 
 const PROVINCES = ["Punjab", "Sindh", "Khyber Pakhtunkhwa", "Balochistan", "Islamabad Capital Territory", "Gilgit-Baltistan", "Azad Kashmir"];
 
@@ -25,6 +26,11 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (lines.length > 0) trackBeginCheckout(subtotal);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -71,7 +77,7 @@ export default function CheckoutPage() {
       }
 
       clear();
-      router.push(`/order-confirmation?orderNumber=${data.orderNumber}`);
+      router.push(`/order-confirmation?orderNumber=${data.orderNumber}&total=${data.total}`);
     } catch {
       setError("Something went wrong while placing your order. Please try again.");
       setSubmitting(false);

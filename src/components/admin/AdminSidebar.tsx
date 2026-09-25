@@ -32,6 +32,7 @@ const NAV_SECTIONS = [
     items: [
       { href: "/admin/suppliers", label: "Suppliers" },
       { href: "/admin/procurement", label: "Procurement" },
+      { href: "/admin/inventory", label: "Inventory" },
     ],
   },
   {

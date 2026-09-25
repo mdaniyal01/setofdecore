@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cart-context";
+import { trackAddToCart } from "@/lib/analytics";
 
 interface Variant {
   _id: string;
@@ -57,12 +58,14 @@ export default function ProductActions({
 
   function handleAddToCart() {
     addLine(buildLine());
+    trackAddToCart({ productId, name, unitPrice, quantity });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   }
 
   function handleBuyNow() {
     addLine(buildLine());
+    trackAddToCart({ productId, name, unitPrice, quantity });
     router.push("/cart");
   }
 
