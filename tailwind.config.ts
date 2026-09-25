@@ -8,10 +8,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#F8F5EF",
-        bgSecondary: "#EFE8DE",
-        ink: "#292725",
-        taupe: "#A99B8B",
+        bg: "#F1E8DA",
+        bgSecondary: "#E3D5C0",
+        ink: "#241E17",
+        taupe: "#8B7355",
+        accent: "#A5643F",
       },
       fontFamily: {
         sans: ["var(--font-dm-sans)", "sans-serif"],

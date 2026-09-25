@@ -36,7 +36,7 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
             <div className="flex h-full items-center justify-center text-taupe">No image</div>
           )}
           {onSale && (
-            <span className="absolute left-3 top-3 rounded-sm bg-ink px-2 py-1 text-xs text-white">
+            <span className="absolute left-3 top-3 rounded-sm bg-accent px-2 py-1 text-xs text-white">
               -{discountPct}%
             </span>
           )}
