@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import CategoryGrid from "@/components/home/CategoryGrid";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
@@ -7,7 +8,28 @@ import RoomInspiration from "@/components/home/RoomInspiration";
 import BrandBenefits from "@/components/home/BrandBenefits";
 import NewsletterSection from "@/components/home/NewsletterSection";
 
+const DEFAULTS = {
+  heroHeading: "Make Space Beautiful.",
+  heroSubtext:
+    "Thoughtfully selected home textiles designed to bring comfort and character to every corner of your home.",
+  heroPrimaryButtonText: "Shop Collection",
+  heroPrimaryButtonUrl: "/shop",
+  heroSecondaryButtonText: "Explore New Arrivals",
+  heroSecondaryButtonUrl: "/shop?sort=newest",
+};
+
 export default function HomePage() {
+  const [hero, setHero] = useState(DEFAULTS);
+
+  useEffect(() => {
+    fetch("/api/homepage")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.settings) setHero({ ...DEFAULTS, ...data.settings });
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <main>
       <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden bg-bgSecondary px-6 text-center">
@@ -26,7 +48,7 @@ export default function HomePage() {
             transition={{ duration: 0.7, ease: "easeOut" }}
             className="font-display text-5xl leading-[1.1] md:text-7xl"
           >
-            Make Space Beautiful.
+            {hero.heroHeading}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 18 }}
@@ -34,8 +56,7 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
             className="mx-auto mt-5 max-w-lg text-taupe md:text-lg"
           >
-            Thoughtfully selected home textiles designed to bring comfort and
-            character to every corner of your home.
+            {hero.heroSubtext}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -44,16 +65,16 @@ export default function HomePage() {
             className="mt-9 flex flex-wrap justify-center gap-4"
           >
             <a
-              href="/shop"
+              href={hero.heroPrimaryButtonUrl}
               className="rounded-full bg-ink px-7 py-3.5 text-sm font-medium text-white transition hover:scale-[1.03] hover:opacity-90"
             >
-              Shop Collection
+              {hero.heroPrimaryButtonText}
             </a>
             <a
-              href="/shop?sort=newest"
+              href={hero.heroSecondaryButtonUrl}
               className="rounded-full border border-ink px-7 py-3.5 text-sm font-medium transition hover:scale-[1.03] hover:bg-ink hover:text-white"
             >
-              Explore New Arrivals
+              {hero.heroSecondaryButtonText}
             </a>
           </motion.div>
         </div>

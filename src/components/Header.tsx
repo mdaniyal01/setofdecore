@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/lib/cart-context";
 
 const NAV_LINKS = [
@@ -18,12 +18,34 @@ const NAV_LINKS = [
 export default function Header() {
   const { count } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [announcement, setAnnouncement] = useState<{ text?: string; enabled: boolean; link?: string } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/homepage")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.settings) {
+          setAnnouncement({
+            text: data.settings.announcementText,
+            enabled: data.settings.announcementEnabled,
+            link: data.settings.announcementLink,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <>
-      <div className="bg-ink py-2 text-center text-xs tracking-wide text-white/90">
-        Nationwide Delivery Across Pakistan · Cash on Delivery Available
-      </div>
+      {announcement?.enabled && announcement.text && (
+        <div className="bg-ink py-2 text-center text-xs tracking-wide text-white/90">
+          {announcement.link ? (
+            <Link href={announcement.link}>{announcement.text}</Link>
+          ) : (
+            announcement.text
+          )}
+        </div>
+      )}
 
       <header className="sticky top-0 z-40 border-b border-ink/10 bg-bg/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
