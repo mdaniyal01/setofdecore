@@ -22,6 +22,8 @@ const NAV_SECTIONS = [
       { href: "/admin/orders", label: "Orders" },
       { href: "/admin/customers", label: "Customers" },
       { href: "/admin/coupons", label: "Coupons" },
+      { href: "/admin/bundles", label: "Bundles" },
+      { href: "/admin/returns", label: "Returns" },
     ],
   },
   {
